@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import Nav from "./components/navbar.jsx";
+import Carous from "./components/feat-carousel.jsx";
+
 function App() {
   function print() {
     console.log("jello");
@@ -9,6 +11,7 @@ function App() {
   return (
     <>
       <Nav />
+      <Carous />
     </>
   );
 }
