@@ -5,7 +5,7 @@ export default function ProductCard({
     id: 0,
     name: "Sample Product",
     description: "This is a placeholder product description.",
-    imageUrl: "",
+    imageUrl: "null",
   },
 }) {
   return (

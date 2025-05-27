@@ -1,95 +1,75 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { BsFillCartFill } from "react-icons/bs";
-import { BsSearch } from "react-icons/bs";
-import { BsPersonFill } from "react-icons/bs";
+import {
+  Navbar,
+  Nav,
+  NavDropdown,
+  Form,
+  FormControl,
+  Button,
+  Container,
+} from "react-bootstrap";
+import { FiShoppingCart, FiUser, FiSearch } from "react-icons/fi";
 
-const Navbar = () => {
+const CustomNavbar = () => {
   return (
-    <nav className="container navbar navbar-expand-lg bg-body-tertiary">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
+    <Navbar expand="lg" bg="light" variant="light">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
           Navbar
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNavDropdown"
-          aria-controls="navbarNavDropdown"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link className="nav-link active" aria-current="page" to="/">
-                Home
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/features">
-                Features
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/cart">
-                Cart <BsFillCartFill />
-              </Link>
-            </li>
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Dropdown link
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <Link className="dropdown-item" to="/action">
-                    Action
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/another-action">
-                    Another action
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/something-else">
-                    Something else here
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <form className="d-flex" role="search">
-            <input
-              className="form-control me-2"
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link as={Link} to="/">
+              Home
+            </Nav.Link>
+            <Nav.Link as={Link} to="/features">
+              Features
+            </Nav.Link>
+            <Nav.Link as={Link} to="/cart">
+              <FiShoppingCart className="me-1" /> Cart
+            </Nav.Link>
+
+            {/* Profile Dropdown */}
+            <NavDropdown
+              title={
+                <>
+                  <FiUser className="me-1" />
+                  Profile
+                </>
+              }
+              id="profile-dropdown"
+            >
+              <NavDropdown.Item as={Link} to="/orders">
+                Your Orders
+              </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/settings">
+                Settings
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item as={Link} to="/logout">
+                Sign Out
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+
+          {/* Search Form */}
+          <Form className="d-flex">
+            <FormControl
               type="search"
               placeholder="Search"
+              className="me-2"
               aria-label="Search"
             />
-            <button className="btn btn-outline-success" type="submit">
-              <BsSearch />
-            </button>
-          </form>
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">
-                Profile <BsPersonFill />
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+            <Button variant="outline-success">
+              <FiSearch />
+            </Button>
+          </Form>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 
-export default Navbar;
+export default CustomNavbar;
