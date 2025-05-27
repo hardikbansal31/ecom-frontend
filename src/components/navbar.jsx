@@ -1,12 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { BsFillCartFill } from "react-icons/bs";
+import { BsSearch } from "react-icons/bs";
+import { BsPersonFill } from "react-icons/bs";
 
 const Navbar = () => {
   return (
     <nav className="container navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">
+        <Link className="navbar-brand" to="/">
           Navbar
-        </a>
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -21,19 +25,19 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarNavDropdown">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">
+              <Link className="nav-link active" aria-current="page" to="/">
                 Home
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
+              <Link className="nav-link" to="/features">
                 Features
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
-                Pricing
-              </a>
+              <Link className="nav-link" to="/cart">
+                Cart <BsFillCartFill />
+              </Link>
             </li>
             <li className="nav-item dropdown">
               <a
@@ -47,19 +51,19 @@ const Navbar = () => {
               </a>
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/action">
                     Action
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/another-action">
                     Another action
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/something-else">
                     Something else here
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </li>
@@ -72,9 +76,16 @@ const Navbar = () => {
               aria-label="Search"
             />
             <button className="btn btn-outline-success" type="submit">
-              Search
+              <BsSearch />
             </button>
           </form>
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <Link className="nav-link" to="/">
+                Profile <BsPersonFill />
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>
