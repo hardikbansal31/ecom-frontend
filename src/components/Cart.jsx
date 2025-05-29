@@ -1,41 +1,32 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Toast } from "bootstrap";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  ListGroup,
+  Toast,
+  ToastContainer,
+  Form,
+  Image,
+  InputGroup,
+} from "react-bootstrap";
+
+import ProductCard from "./ProductCard.jsx";
 
 const TAX_RATE = 0.1;
 const DELIVERY_CHARGE = 50;
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Product A",
-      price: 500,
-      quantity: 2,
-      imageUrl: "null",
-    },
-    {
-      id: 2,
-      name: "Product B",
-      price: 300,
-      quantity: 1,
-      imageUrl: "null",
-    },
+    { id: 1, name: "Product A", price: 500, quantity: 2, imageUrl: "null" },
+    { id: 2, name: "Product B", price: 300, quantity: 1, imageUrl: "null" },
   ]);
 
   const [toastMessage, setToastMessage] = useState("");
-  const toastRef = useRef(null);
-
-  const showToast = (message) => {
-    setToastMessage(message);
-    const toastEl = toastRef.current;
-
-    if (toastEl) {
-      const bsToast = new Toast(toastEl);
-      bsToast.show();
-    }
-  };
-
+  const [showToast, setShowToast] = useState(false);
 
   const isEmpty = cartItems.length === 0;
 
@@ -52,7 +43,8 @@ const Cart = () => {
   const removeItem = (id) => {
     const removedItem = cartItems.find((item) => item.id === id);
     setCartItems((prev) => prev.filter((item) => item.id !== id));
-    showToast(`${removedItem.name} removed from cart`);
+    setToastMessage(`${removedItem.name} removed from cart`);
+    setShowToast(true);
   };
 
   const subtotal = cartItems.reduce(
@@ -63,45 +55,41 @@ const Cart = () => {
   const total = subtotal + tax + (isEmpty ? 0 : DELIVERY_CHARGE);
 
   return (
-    <div className="container mt-4">
+    <Container className="mt-4">
       <h2 className="mb-4">Your Cart</h2>
 
-      {/* Bootstrap Toast */}
-      <div
-        ref={toastRef}
-        className="toast position-fixed bottom-0 end-0 m-4"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <div className="toast-header">
-          <strong className="me-auto">Cart</strong>
-          <button
-            type="button"
-            className="btn-close"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div className="toast-body">{toastMessage}</div>
-      </div>
+      {/* Toast Container */}
+      <ToastContainer position="bottom-end" className="p-3">
+        <Toast
+          bg="info"
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={3000}
+          autohide
+        >
+          <Toast.Header closeButton>
+            <strong className="me-auto">Cart</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
 
-      <div className="row">
+      <Row>
         {/* Left Column */}
-        <div className="col-md-8">
+        <Col md={8}>
           {isEmpty ? (
             <p>Your cart is empty.</p>
           ) : (
             cartItems.map((item) => (
-              <div
+              <Card
                 key={item.id}
-                className="card mb-3 p-3 d-flex flex-row align-items-center"
+                className="mb-3 p-3 d-flex flex-row align-items-center"
               >
                 <Link to={`/product/${item.id}`}>
-                  <img
+                  <Image
                     src={item.imageUrl}
                     alt={item.name}
-                    className="img-thumbnail"
+                    thumbnail
                     style={{
                       width: "100px",
                       height: "100px",
@@ -109,84 +97,90 @@ const Cart = () => {
                     }}
                   />
                 </Link>
+
                 <div className="ms-3 flex-grow-1">
-                  <h5 className="mb-1">{item.name}</h5>
-                  <p className="mb-1">Price: ₹{item.price}</p>
+                  <h5>{item.name}</h5>
+                  <p>Price: ₹{item.price}</p>
                   <div className="d-flex align-items-center">
-                    <label className="me-2">Qty:</label>
-                    <div className="btn-group" role="group">
-                      <button
-                        className="btn btn-outline-secondary"
+                    <span className="me-2">Qty:</span>
+                    <InputGroup style={{ width: "130px" }}>
+                      <Button
+                        variant="outline-secondary"
                         onClick={() => updateQuantity(item.id, -1)}
                         disabled={item.quantity === 1}
                       >
                         -
-                      </button>
-                      <input
+                      </Button>
+                      <Form.Control
                         type="text"
                         readOnly
-                        className="form-control text-center"
-                        style={{ width: "50px" }}
                         value={item.quantity}
+                        className="text-center"
                       />
-                      <button
-                        className="btn btn-outline-secondary"
+                      <Button
+                        variant="outline-secondary"
                         onClick={() => updateQuantity(item.id, 1)}
                       >
                         +
-                      </button>
-                    </div>
+                      </Button>
+                    </InputGroup>
                   </div>
                 </div>
+
                 <div className="d-flex flex-column align-items-end">
                   <strong className="mb-2">
                     ₹{item.price * item.quantity}
                   </strong>
-                  <button
-                    className="btn btn-sm btn-danger"
+                  <Button
+                    variant="danger"
+                    size="sm"
                     onClick={() => removeItem(item.id)}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             ))
           )}
-        </div>
+        </Col>
 
-        {/* Right Column - Summary */}
-        <div className="col-md-4">
-          <div className="card p-3">
+        {/* Right Column */}
+        <Col md={4}>
+          <Card className="p-3">
             <h5 className="mb-3">Cost Breakdown</h5>
-            <ul className="list-group list-group-flush">
-              <li className="list-group-item d-flex justify-content-between">
+            <ListGroup variant="flush">
+              <ListGroup.Item className="d-flex justify-content-between">
                 <span>Items ({cartItems.length})</span>
                 <span>₹{subtotal}</span>
-              </li>
-              <li className="list-group-item d-flex justify-content-between">
+              </ListGroup.Item>
+              <ListGroup.Item className="d-flex justify-content-between">
                 <span>Tax (10%)</span>
                 <span>₹{tax.toFixed(2)}</span>
-              </li>
-              <li className="list-group-item d-flex justify-content-between">
+              </ListGroup.Item>
+              <ListGroup.Item className="d-flex justify-content-between">
                 <span>Delivery</span>
                 <span>₹{isEmpty ? 0 : DELIVERY_CHARGE}</span>
-              </li>
-              <li className="list-group-item d-flex justify-content-between fw-bold">
+              </ListGroup.Item>
+              <ListGroup.Item className="d-flex justify-content-between fw-bold">
                 <span>Total</span>
                 <span>₹{total.toFixed(2)}</span>
-              </li>
-            </ul>
-            <button
-              className="btn btn-success mt-3 w-100"
+              </ListGroup.Item>
+            </ListGroup>
+
+            <Button
+              variant="success"
+              className="mt-3 w-100"
               disabled={isEmpty}
               onClick={() => alert("Proceeding to checkout...")}
             >
               Buy Now
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Button>
+          </Card>
+        </Col>
+      </Row>
+      <h2 className="mt-5">You may also like...</h2>
+      <ProductCard />
+    </Container>
   );
 };
 
