@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { FaCartPlus } from "react-icons/fa"; // using react-icons for cart icon
+import { FaCartPlus } from "react-icons/fa";
+import { useState } from "react";
 
 export default function ProductCard({
   product = {
@@ -9,8 +10,41 @@ export default function ProductCard({
     price: 0,
     imageUrl: "null",
   },
-  onAddToCart = () => alert("Add to cart clicked!"), // default handler
 }) {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleAddToCart = async () => {
+    setError("");
+    setSuccess("");
+
+    // example: get user_id from localStorage
+    const userId = localStorage.getItem("user_id"); // must be set at login
+
+    if (!userId) {
+      setError("Please log in first.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5001/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: parseInt(userId),
+          prod_id: product.id,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add to cart");
+      setSuccess("Product added to cart!");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div className="card" style={{ width: "18rem" }}>
       <img
@@ -28,12 +62,14 @@ export default function ProductCard({
           </Link>
           <button
             className="btn btn-outline-secondary"
-            onClick={() => onAddToCart(product)}
+            onClick={handleAddToCart}
             title="Add to Cart"
           >
             <FaCartPlus />
           </button>
         </div>
+        {success && <p className="text-success mt-2">{success}</p>}
+        {error && <p className="text-danger mt-2">{error}</p>}
       </div>
     </div>
   );

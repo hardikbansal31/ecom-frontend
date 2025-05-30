@@ -19,6 +19,11 @@ const FeatCarousel = () => {
   return (
     <div>
       <h1 className="text-center my-4">Featured Products</h1>
+      <p className="text-center my-4">
+        <i>Backend is has spun down! (offline)</i>
+        <br />
+        <i>website may not be fully functional</i>
+      </p>
       <Carousel fade interval={3000}>
         {images.map((image, index) => (
           <Carousel.Item key={index}>

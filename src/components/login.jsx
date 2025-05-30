@@ -22,6 +22,7 @@ export default function Login() {
       });
       if (!res.ok) throw new Error("Invalid credentials");
       const data = await res.json();
+      localStorage.setItem("user_id", data.user_id);
       localStorage.setItem("token", data.token); // Save JWT
       alert("Login successful!");
     } catch (err) {
