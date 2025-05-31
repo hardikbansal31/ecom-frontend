@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { FaHome } from "react-icons/fa";
+
 import {
   Navbar,
   Nav,
@@ -10,13 +12,16 @@ import {
   Container,
 } from "react-bootstrap";
 import { FiShoppingCart, FiUser, FiSearch } from "react-icons/fi";
+import { AuthContext } from "../context/AuthContext";
 
 const CustomNavbar = () => {
+  const { username, logout } = useContext(AuthContext);
+
   return (
     <Navbar expand="lg" bg="light" variant="light">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          Navbar
+          <FaHome />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
@@ -24,44 +29,58 @@ const CustomNavbar = () => {
             <Nav.Link as={Link} to="/">
               Home
             </Nav.Link>
-            <Nav.Link as={Link} to="/features">
-              Features
-            </Nav.Link>
+            <NavDropdown title="Categories" id="categories-dropdown">
+              <NavDropdown.Item as={Link} to="/orders">
+                Popular
+              </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/phones">
+                Phones
+              </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/laptops">
+                Laptops
+              </NavDropdown.Item>
+            </NavDropdown>
+
             <Nav.Link as={Link} to="/cart">
               <FiShoppingCart className="me-1" /> Cart
             </Nav.Link>
 
-            {/* Profile Dropdown */}
             <NavDropdown
               title={
                 <>
                   <FiUser className="me-1" />
-                  Profile
+                  {username || "Profile"}
                 </>
               }
               id="profile-dropdown"
             >
-              <NavDropdown.Item as={Link} to="/orders">
-                Your Orders
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/settings">
-                Settings
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to="/logout">
-                Sign Out
-              </NavDropdown.Item>
+              {username ? (
+                <>
+                  <NavDropdown.Item as={Link} to="/orders">
+                    Your Orders
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/settings">
+                    Settings
+                  </NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item onClick={logout}>Sign Out</NavDropdown.Item>
+                </>
+              ) : (
+                <>
+                  <NavDropdown.Item as={Link} to="/login">
+                    Sign In
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/register">
+                    Register
+                  </NavDropdown.Item>
+                </>
+              )}
             </NavDropdown>
           </Nav>
 
-          {/* Search Form */}
+          {/* Search */}
           <Form className="d-flex">
-            <FormControl
-              type="search"
-              placeholder="Search"
-              className="me-2"
-              aria-label="Search"
-            />
+            <FormControl type="search" placeholder="Search" className="me-2" />
             <Button variant="outline-success">
               <FiSearch />
             </Button>

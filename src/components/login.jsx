@@ -1,11 +1,13 @@
-// src/pages/Login.jsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Form, Button, Container, Alert } from "react-bootstrap";
-
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -22,9 +24,10 @@ export default function Login() {
       });
       if (!res.ok) throw new Error("Invalid credentials");
       const data = await res.json();
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("token", data.token); // Save JWT
-      alert("Login successful!");
+      console.log(data.id);
+      localStorage.setItem("user_id", data.id);
+      login(data);
+      navigate('/');
     } catch (err) {
       setError(err.message);
     }
