@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import {
   Container,
@@ -20,31 +21,99 @@ const TAX_RATE = 0.1;
 const DELIVERY_CHARGE = 50;
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Product A", price: 500, quantity: 2, imageUrl: "null" },
-    { id: 2, name: "Product B", price: 300, quantity: 1, imageUrl: "null" },
-  ]);
-
+  const { username } = useContext(AuthContext);
+  const [cartItems, setCartItems] = useState([]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
-  const isEmpty = cartItems.length === 0;
+  useEffect(() => {
+    displayCart();
+  }, []);
 
-  const updateQuantity = (id, change) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
+  const displayCart = async () => {
+    setError("");
+    setSuccess("");
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+      setError("Please log in first.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:5001/api/cart/${userId}`);
+      if (!res.ok) throw new Error("Failed to fetch cart items");
+      const data = await res.json();
+      setCartItems(data); // ✅ Populate from DB
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeItem = (id) => {
-    const removedItem = cartItems.find((item) => item.id === id);
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-    setToastMessage(`${removedItem.name} removed from cart`);
-    setShowToast(true);
+  const isEmpty = cartItems.length === 0;
+
+  const updateQuantity = async (id, change) => {
+    const userId = localStorage.getItem("user_id");
+    if (!userId) {
+      setError("Please log in first");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `http://localhost:5001/api/cart/update/${userId}/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ change }),
+        }
+      );
+      if (!res.ok) throw new Error("Failed to update quantity");
+
+      const updatedRes = await fetch(
+        `http://localhost:5001/api/cart/${userId}`
+      );
+      const data = await updatedRes.json();
+      setCartItems(data);
+    } catch (err) {
+      setError("Update failed: " + err.message);
+    }
+  };
+
+  const removeItem = async (id) => {
+    if (!window.confirm("Are you sure you want to remove this item?")) return;
+
+    const userId = localStorage.getItem("user_id");
+    if (!userId) {
+      setError("Please log in first");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `http://localhost:5001/api/cart/remove/${userId}/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!res.ok) throw new Error("Failed to remove item");
+
+      // update UI
+      const removedItem = cartItems.find((item) => item.id === id);
+      setCartItems((prev) => prev.filter((item) => item.id !== id));
+      setToastMessage(`${removedItem.name} removed from cart`);
+      setShowToast(true);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const subtotal = cartItems.reduce(
