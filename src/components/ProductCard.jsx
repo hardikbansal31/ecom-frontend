@@ -65,7 +65,12 @@ export default function ProductCard({
       />
       <div className="card-body">
         <h5 className="card-title">{product.name}</h5>
-        <p className="card-text">{product.description.slice(0, 60)}...</p>
+        <p className="card-text">
+          {product.description
+            ? product.description.slice(0, 60) + "..."
+            : "No description available"}
+        </p>
+
         <p className="card-text fw-bold">₹{product.price}</p>
         <div className="d-flex justify-content-between align-items-center">
           <Link to={`/product/${product.id}`} className="btn btn-primary">

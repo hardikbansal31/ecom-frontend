@@ -13,6 +13,7 @@ import {
   Form,
   Image,
   InputGroup,
+  Spinner,
 } from "react-bootstrap";
 
 import ProductCard from "./ProductCard.jsx";
@@ -28,6 +29,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     displayCart();
@@ -123,6 +125,13 @@ const Cart = () => {
   const tax = subtotal * TAX_RATE;
   const total = subtotal + tax + (isEmpty ? 0 : DELIVERY_CHARGE);
 
+  useEffect(() => {
+    fetch("http://localhost:5001/api/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error("error fetching producs", err));
+  }, []);
+
   return (
     <Container className="mt-4">
       <h2 className="mb-4">Your Cart</h2>
@@ -146,7 +155,13 @@ const Cart = () => {
       <Row>
         {/* Left Column */}
         <Col md={8}>
-          {isEmpty ? (
+          {error ? (
+            <p className="text-danger">{error}</p>
+          ) : loading ? (
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          ) : isEmpty ? (
             <p>Your cart is empty.</p>
           ) : (
             cartItems.map((item) => (
@@ -248,7 +263,15 @@ const Cart = () => {
         </Col>
       </Row>
       <h2 className="mt-5">You may also like...</h2>
-      <ProductCard />
+      {/* <ProductCard /> */}
+      <div className="row gy-4 mt-3">
+        {/* Placeholder cards */}
+        {products.map((product) => (
+          <div key={product.id} className="col-sm-6 col-md-4">
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
     </Container>
   );
 };

@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import chiron from '../assets/imgs/chiron.jpeg';
+import chiron from "../assets/imgs/chiron.jpeg";
 import {
   Container,
   Row,
@@ -10,10 +10,14 @@ import {
   Spinner,
   Badge,
 } from "react-bootstrap";
+import { FaCartPlus } from "react-icons/fa";
 
 export default function ProductPg() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetch(`http://localhost:5001/api/products/${id}`)
@@ -30,6 +34,39 @@ export default function ProductPg() {
       </div>
     );
   }
+  const handleAddToCart = async () => {
+    setError("");
+    setSuccess("");
+
+    const userId = localStorage.getItem("user_id"); // ✅ move this inside
+    console.log(userId);
+
+    if (!userId) {
+      setError("Please log in first.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:5001/api/cart/add/${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: parseInt(userId),
+          prod_id: product.id,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add to cart");
+      setSuccess("Product added to cart!");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Container className="mt-5">
@@ -43,15 +80,32 @@ export default function ProductPg() {
             rounded
             className="mb-4"
           />
-          <Button variant="primary" className="me-2">
-            Add to Cart
+          <Button variant="success" className="me-2">
+            Buy Now
           </Button>
-          <Button variant="success">Buy Now</Button>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={handleAddToCart}
+            title="Add to Cart"
+            disabled={loading}
+          >
+            {loading ? (
+              "Adding..."
+            ) : (
+              <>
+                <FaCartPlus className="me-1" />
+                Add to Cart
+              </>
+            )}
+          </button>
+          {success && <p className="text-success mt-2">{success}</p>}
+          {error && <p className="text-danger mt-2">{error}</p>}
         </Col>
 
         {/* Right column: Details */}
         <Col md={7}>
           <h2>{product.name}</h2>
+          <h3>₹ {product.price}</h3>
 
           {/* Star rating out of 5 */}
           <div className="mb-2">

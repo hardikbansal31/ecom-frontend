@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+import pool from "../config/db.js";
 
 router.post("/create", async (req, res) => {
   const { userId } = req.body;
