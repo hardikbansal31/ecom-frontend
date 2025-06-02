@@ -59,4 +59,38 @@ router.get("/:userId", async (req, res) => {
     res.status(500).json({ error: "failed to fetch orders" });
   }
 });
+
+router.post("/buy", async (req, res) => {
+  const { userId, productId, quantity = 1 } = req.body;
+
+  if (!userId || !productId) {
+    return res.status(400).json({ error: "Missing userId or productId" });
+  }
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const [orderResult] = await conn.query(
+      "INSERT INTO orders (user_id) VALUES (?)",
+      [userId]
+    );
+    const orderId = orderResult.insertId;
+
+    await conn.query(
+      "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",
+      [orderId, productId, quantity]
+    );
+
+    await conn.commit();
+    res.json({ message: "Order placed successfully", orderId });
+  } catch (err) {
+    await conn.rollback();
+    console.error("Buy Now Error:", err);
+    res.status(500).json({ error: "Failed to place order" });
+  } finally {
+    conn.release();
+  }
+});
+
 export default router;
