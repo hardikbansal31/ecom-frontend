@@ -41,4 +41,3 @@ app
   .on("error", (err) => {
     console.error("Server failed to start:", err.message);
   });
-

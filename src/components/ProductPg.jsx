@@ -23,7 +23,7 @@ export default function ProductPg() {
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [quantity, setQuantity] = useState(1);
-
+  const [unsplashImage, setUnsplashImage] = useState(null);
 
   useEffect(() => {
     fetch(`http://localhost:5001/api/products/${id}`)
@@ -31,6 +31,35 @@ export default function ProductPg() {
       .then((data) => setProduct(data))
       .catch((err) => console.error("error fetching product", err));
   }, [id]);
+
+  useEffect(() => {
+    if (!product || !product.name) return; // ✅ prevent error
+    async function img() {
+      try {
+        const KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
+        const res = await fetch(
+          `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+            product.name
+          )}&client_id=${KEY}`
+        );
+        const data = await res.json();
+        console.log(data);
+        if (data.results.length > 0) {
+          const image = data.results[0];
+          setUnsplashImage({
+            imageUrl: image.urls.regular,
+            altText: image.alt_description || product.name,
+            photographer: image.user.name,
+            photographerLink: image.user.links.html,
+          });
+        }
+      } catch (err) {
+        console.error("error fetching Unsplash image", err);
+      }
+    }
+
+    img();
+  }, [product]);
 
   if (!product) {
     return (
@@ -41,45 +70,41 @@ export default function ProductPg() {
     );
   }
 
-const handleBuyNow = async () => {
-  setError("");
-  setSuccess("");
+  const handleBuyNow = async () => {
+    setError("");
+    setSuccess("");
 
-  const userId = localStorage.getItem("user_id");
-  if (!userId) {
-    setError("Please log in first.");
-    return;
-  }
+    const userId = localStorage.getItem("user_id");
+    if (!userId) {
+      setError("Please log in first.");
+      return;
+    }
 
-  setLoading(true);
-  try {
-    const res = await fetch("http://localhost:5001/api/order/buy", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: parseInt(userId),
-        productId: product.id,
-        quantity,
-      }),
-    });
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5001/api/order/buy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: parseInt(userId),
+          productId: product.id,
+          quantity,
+        }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to place order");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to place order");
 
-    setSuccess(`Order placed! Order ID: ${data.orderId}`);
-    setShowConfirm(false);
-    // Optional: redirect to order confirmation page
-    // navigate(`/orders/${data.orderId}`);
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+      setSuccess(`Order placed! Order ID: ${data.orderId}`);
+      setShowConfirm(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddToCart = async () => {
     setError("");
@@ -121,21 +146,21 @@ const handleBuyNow = async () => {
         {/* Left column: Image + Buttons */}
         <Col md={5}>
           <Image
-            src={product.imageUrl || chiron}
+            src={unsplashImage?.imageUrl || chiron}
             alt={product.name}
             fluid
             rounded
             className="mb-4"
           />
           <Button
-            variant="success"
+            variant="success mr-3"
             onClick={() => navigate(`/checkout/${product.id}`)}
           >
             Buy Now
           </Button>
 
           <button
-            className="btn btn-outline-secondary"
+            className="btn btn-outline-secondary ml-3"
             onClick={handleAddToCart}
             title="Add to Cart"
             disabled={loading}
@@ -217,5 +242,4 @@ const handleBuyNow = async () => {
       </Modal>
     </Container>
   );
-  
 }

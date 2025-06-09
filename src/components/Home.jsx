@@ -8,9 +8,9 @@ export default function Home() {
 
   useEffect(() => {
     fetch("http://localhost:5001/api/products")
-    .then((res) => res.json())
-    .then((data) => setProducts(data))
-    .catch((err) => console.error("error fetching producs", err));
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error("error fetching producs", err));
   }, []);
 
   return (
@@ -20,7 +20,7 @@ export default function Home() {
         {/* Placeholder cards */}
         {products.map((product) => (
           <div key={product.id} className="col-sm-6 col-md-4">
-            <ProductCard product={product}/>
+            <ProductCard product={product} />
           </div>
         ))}
       </div>

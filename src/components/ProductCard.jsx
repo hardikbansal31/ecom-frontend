@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { FaCartPlus } from "react-icons/fa";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext"; // adjust path as needed
-import { useId } from "react";
+// import { useId } from "react";
 
 export default function ProductCard({
   product = {
@@ -16,8 +16,38 @@ export default function ProductCard({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [unsplashImage, setUnsplashImage] = useState(null);
 
-  const { username } = useContext(AuthContext); // We use this to check login
+
+  useEffect(() => {
+    async function img() {
+      try {
+        const KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
+        const res = await fetch(
+          `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+            product.name
+          )}&client_id=${KEY}`
+        );
+        const data = await res.json();
+        console.log(data);
+        if (data.results.length > 0) {
+          const image = data.results[0];
+          setUnsplashImage({
+            imageUrl: image.urls.regular,
+            altText: image.alt_description || product.name,
+            photographer: image.user.name,
+            photographerLink: image.user.links.html,
+          });
+        }
+      } catch (err) {
+        console.error("error fetching Unsplash image", err);
+      }
+    }
+
+    img();
+  }, [product.name]);
+
+
   const handleAddToCart = async () => {
     setError("");
     setSuccess("");
@@ -58,11 +88,12 @@ export default function ProductCard({
         src={
           product.imageUrl && product.imageUrl !== "null"
             ? product.imageUrl
-            : "null"
+            : unsplashImage?.imageUrl || "/fallback.jpg"
         }
         className="card-img-top"
-        alt={product.name}
+        alt={unsplashImage?.altText || product.name}
       />
+
       <div className="card-body">
         <h5 className="card-title">{product.name}</h5>
         <p className="card-text">

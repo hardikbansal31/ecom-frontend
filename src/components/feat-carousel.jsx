@@ -41,4 +41,3 @@ const FeatCarousel = () => {
 };
 
 export default FeatCarousel;
- 
