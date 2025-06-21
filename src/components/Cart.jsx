@@ -171,7 +171,7 @@ const Cart = () => {
               >
                 <Link to={`/product/${item.id}`}>
                   <Image
-                    src={item.imageUrl}
+                    src={item.image_url}
                     alt={item.name}
                     thumbnail
                     style={{
