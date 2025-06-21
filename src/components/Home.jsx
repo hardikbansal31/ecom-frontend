@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Carous from "./feat-carousel.jsx";
 import ProductCard from "./ProductCard.jsx";
-// import { data } from "react-router-dom";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -15,7 +14,7 @@ export default function Home() {
 
   return (
     <div className="container mt-4">
-      <Carous />
+      <Carous products={products} />
       <div className="row gy-4 mt-3">
         {/* Placeholder cards */}
         {products.map((product) => (
