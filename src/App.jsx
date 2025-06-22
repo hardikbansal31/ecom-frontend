@@ -8,6 +8,7 @@ import Register from "./components/register.jsx";
 import Login from "./components/login.jsx";
 import Orders from "./components/Orders.jsx";
 import CheckOut from "./components/CheckOut.jsx";
+import AllProducts from "./components/AllProducts.jsx";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/product/:id" element={<ProductPg />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/checkout/:productId" element={<CheckOut />} />
+        <Route path="/all" element={<AllProducts />} />
       </Routes>
       <Footer />
     </>

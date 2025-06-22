@@ -13,8 +13,26 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/all", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM products");
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "No product found" });
+    }
+
+    res.json(rows); // ✅ Send the result rows directly
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "DB error in /all" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   const proId = parseInt(req.params.id);
+  if (isNaN(proId)) {
+    return res.status(400).json({ error: "Invalid product ID" });
+  }
 
   try {
     // Query the database for product by ID
@@ -34,9 +52,8 @@ router.get("/:id", async (req, res) => {
     res.json(rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "db error" });
+    res.status(500).json({ error: "db error in /id" });
   }
 });
-
 
 export default router;

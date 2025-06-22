@@ -29,7 +29,10 @@ const CustomNavbar = () => {
             <Nav.Link as={Link} to="/">
               Home
             </Nav.Link>
-            <NavDropdown title="Categories" id="categories-dropdown">
+            <Nav.Link as={Link} to="/all">
+              All Products
+            </Nav.Link>
+            {/* <NavDropdown title="Categories" id="categories-dropdown">
               <NavDropdown.Item as={Link} to="/orders">
                 Popular
               </NavDropdown.Item>
@@ -39,7 +42,7 @@ const CustomNavbar = () => {
               <NavDropdown.Item as={Link} to="/laptops">
                 Laptops
               </NavDropdown.Item>
-            </NavDropdown>
+            </NavDropdown> */}
 
             <Nav.Link as={Link} to="/cart">
               <FiShoppingCart className="me-1" /> Cart
